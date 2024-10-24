@@ -1,0 +1,83 @@
+#include <stdio.h>
+#include <string.h>
+
+#define MAX_PASSWORD_LENGTH 100
+
+// color codes
+#define COLOR_GREEN "\033[0;32m"
+#define COLOR_RED "\033[0;31m"
+#define COLOR_RESET "\033[0m"
+#define COLOR_YELLOW "\033[0;33m"
+
+void updatePassword(char *savedPassword) {
+    printf("Enter new password: ");
+    fgets(savedPassword, MAX_PASSWORD_LENGTH, stdin);
+    // Remove newline character from the end of the input
+    savedPassword[strcspn(savedPassword, "\n")] = 0;
+}
+
+void comparePasswords(const char *savedPassword) {
+    char inputPassword[MAX_PASSWORD_LENGTH];
+
+    printf("Enter password to compare: ");
+    fgets(inputPassword, MAX_PASSWORD_LENGTH, stdin);
+    inputPassword[strcspn(inputPassword, "\n")] = 0; // Remove newline character
+
+    int savedLength = strlen(savedPassword);
+    int inputLength = strlen(inputPassword);
+
+    // Print lengths of both passwords
+    printf("Length of saved password: %d\n", savedLength);
+    printf("Length of input password: %d\n", inputLength);
+
+    if (savedLength == inputLength && strcmp(savedPassword, inputPassword) == 0) {
+        printf(COLOR_GREEN "Password is correct.\n" COLOR_RESET);
+    } else {
+        printf(COLOR_RED "Password is incorrect.\n" COLOR_RESET);
+        if (savedLength > inputLength) {
+            printf("You need %d more characters.\n", savedLength - inputLength);
+        } else if (savedLength < inputLength) {
+            printf("You need to remove %d characters.\n", inputLength - savedLength);
+        }
+    }
+
+    // Print concatenated passwords
+    char concatenated[MAX_PASSWORD_LENGTH * 2];
+    snprintf(concatenated, sizeof(concatenated), "%s%s", savedPassword, inputPassword);
+    printf("Concatenated password: %s\n", concatenated);
+}
+
+int main() {
+    char savedPassword[MAX_PASSWORD_LENGTH];
+
+    // Set password prompt in green
+    printf(COLOR_GREEN "Set a password: " COLOR_RESET);
+    fgets(savedPassword, MAX_PASSWORD_LENGTH, stdin);
+    savedPassword[strcspn(savedPassword, "\n")] = 0; // Remove newline character
+
+    int choice;
+    do {
+        printf("\n1. Compare Password\n2. Update Password\n3. Exit\n");
+        printf("Choose an option: ");
+        scanf("%d", &choice);
+        getchar(); // Consume the newline character after scanf
+
+        switch (choice) {
+            case 1:
+                comparePasswords(savedPassword);
+                break;
+            case 2:
+                updatePassword(savedPassword);
+                printf(COLOR_YELLOW "Your password has been updated.\n" COLOR_RESET);
+                break;
+            case 3:
+                printf("Exiting program.\n");
+                break;
+            default:
+                printf("Invalid option. Please try again.\n");
+                break;
+        }
+    } while (choice != 3);
+
+    return 0;
+}
